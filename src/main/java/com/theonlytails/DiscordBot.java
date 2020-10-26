@@ -12,7 +12,7 @@ public class DiscordBot {
 
     public static void main(String[] args) throws LoginException {
         jda = JDABuilder
-                .createDefault("NzQ1MzMxOTI2MTAwODY5MTYx.XzwOcg.My2UZkVQ007qXoeO__PEF7X3xcA")
+                .createDefault(jda.getToken())
                 .build();
 
         jda.getPresence().setPresence(OnlineStatus.DO_NOT_DISTURB,
