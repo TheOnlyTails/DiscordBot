@@ -4,8 +4,8 @@ plugins {
 	java
 	idea
 	application
-	id("com.github.johnrengelman.shadow") version "6.1.0"
-	kotlin("jvm") version "1.4.21"
+	id("com.github.johnrengelman.shadow") version "latest.release"
+	kotlin("jvm") version "latest.release"
 }
 
 val mavenGroup: String by extra
@@ -14,20 +14,19 @@ val jdaVersion: String by extra
 
 repositories {
 	mavenCentral()
-	jcenter()
+	maven(url = "https://m2.dv8tion.net/releases")
+	maven(url = "https://jitpack.io")
 }
 
 dependencies {
-	testImplementation(group = "junit", name = "junit", version = "4.12")
-
-	implementation(group = "net.dv8tion", name = "JDA", version = jdaVersion)
-	implementation(group = "com.nfbsoftware", name = "latex-converter", version = "1.0.1")
-	implementation(group = "ch.qos.logback", name = "logback-classic", version = "1.2.3")
+	implementation(group = "net.dv8tion", name = "JDA", version = "latest.release")
+	implementation(group = "com.nfbsoftware", name = "latex-converter", version = "latest.release")
+	implementation(group = "ch.qos.logback", name = "logback-classic", version = "latest.release")
+	implementation(group = "io.github.cdimascio", name = "dotenv-kotlin", version = "latest.release")
 }
 
 tasks.withType<KotlinCompile>().configureEach {
 	kotlinOptions {
-		jvmTarget = "15"
-		languageVersion = "1.4"
+		jvmTarget = "16"
 	}
 }
