@@ -26,8 +26,15 @@ class EventListener : ListenerAdapter() {
 fun onHelp(event: SlashCommandEvent) {
 	event.reply {
 		embed {
+			setAuthor(
+				"Made by TheOnlyTails",
+				"https://theonlytails.com/",
+				jda.getUserById(645291351562518542L)?.avatarUrl
+					?: throw NullPointerException("The avatar for TheOnlyTails couldn't be found.")
+			)
 			title("LaTeXBot")
-			field("About", "This bot is used to parse LaTeX expressions. Just type ${prefix}latex")
+			field("About", "This bot is used to parse LaTeX expressions. Just type `${prefix}latex <expression>`")
+			color(Color.green)
 		}
 	}
 }
@@ -65,7 +72,7 @@ fun onLatex(event: SlashCommandEvent) {
 				title("LaTeX Rendering Result")
 				field("Processed expression:", "`$latexExpression`")
 				image(data["link"].toString().trim('"'))
-				footer("LaTeXBot by TheOnlyTails", event.jda.getUserById(745331926100869161L)?.effectiveAvatarUrl ?: "")
+				footer("LaTeXBot by TheOnlyTails", botAvatar)
 				color(Color.green)
 			}
 		).queue()

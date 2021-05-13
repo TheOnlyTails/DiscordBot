@@ -10,11 +10,15 @@ import java.util.logging.Logger
 const val prefix = "/"
 val logger: Logger = Logger.getLogger("LaTeXBot")
 
+val jda = JDABuilder
+	.createDefault(dotenv()["TOKEN"] ?: throw IllegalArgumentException("token not found"))
+	.addEventListeners(EventListener())
+	.build()
+
+val botAvatar = jda.getUserById(745331926100869161L)?.effectiveAvatarUrl
+	?: throw NullPointerException("The avatar for TheOnlyTails couldn't be found.")
+
 fun main() {
-	val jda = JDABuilder
-		.createDefault(dotenv()["TOKEN"] ?: throw IllegalArgumentException("token not found"))
-		.addEventListeners(EventListener())
-		.build()
 
 	jda.presence.setPresence(
 		OnlineStatus.DO_NOT_DISTURB,
