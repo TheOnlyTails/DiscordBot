@@ -12,3 +12,5 @@ fun EmbedBuilder.title(title: String) = setTitle(title)
 fun EmbedBuilder.color(color: Color) = setColor(color)
 fun EmbedBuilder.image(url: String) = setImage(url)
 fun EmbedBuilder.footer(text: String, iconUrl: String = "") = setFooter(text, iconUrl.ifBlank { null })
+fun EmbedBuilder.author(name: String, url: String = "", iconUrl: String = "") =
+	setAuthor(name, url.ifBlank { null }, iconUrl.ifBlank { null })

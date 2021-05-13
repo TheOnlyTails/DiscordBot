@@ -26,7 +26,7 @@ class EventListener : ListenerAdapter() {
 fun onHelp(event: SlashCommandEvent) {
 	event.reply {
 		embed {
-			setAuthor(
+			author(
 				"Made by TheOnlyTails",
 				"https://theonlytails.com/",
 				jda.getUserById(645291351562518542L)?.avatarUrl
@@ -68,7 +68,7 @@ fun onLatex(event: SlashCommandEvent) {
 
 		event.hook.editOriginal(
 			embed {
-				setAuthor(event.user.name, null, event.user.effectiveAvatarUrl)
+				author(event.user.name, iconUrl = event.user.effectiveAvatarUrl)
 				title("LaTeX Rendering Result")
 				field("Processed expression:", "`$latexExpression`")
 				image(data["link"].toString().trim('"'))
