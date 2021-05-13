@@ -6,6 +6,7 @@ plugins {
 	application
 	id("com.github.johnrengelman.shadow") version "latest.release"
 	kotlin("jvm") version "latest.release"
+	kotlin("plugin.serialization") version "latest.release"
 }
 
 val mavenGroup: String by extra
@@ -19,10 +20,13 @@ repositories {
 }
 
 dependencies {
-	implementation(group = "net.dv8tion", name = "JDA", version = "latest.release")
+	// implementation(group = "net.dv8tion", name = "JDA", version = "latest.release")
+	implementation(group = "com.github.dv8fromtheworld", name = "jda", version = "feature~slash-commands-SNAPSHOT")
 	implementation(group = "com.nfbsoftware", name = "latex-converter", version = "latest.release")
 	implementation(group = "ch.qos.logback", name = "logback-classic", version = "latest.release")
 	implementation(group = "io.github.cdimascio", name = "dotenv-kotlin", version = "latest.release")
+	implementation(group = "com.squareup.okhttp3", name = "okhttp", version = "4.9.0")
+	implementation(group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version = "latest.release")
 }
 
 tasks.withType<KotlinCompile>().configureEach {
