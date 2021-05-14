@@ -22,6 +22,7 @@ repositories {
 dependencies {
 	// implementation(group = "net.dv8tion", name = "JDA", version = "latest.release")
 	implementation(group = "com.github.dv8fromtheworld", name = "jda", version = "feature~slash-commands-SNAPSHOT")
+	implementation(group = "com.github.minndevelopment", name = "jda-ktx", version = "master-SNAPSHOT")
 	implementation(group = "com.nfbsoftware", name = "latex-converter", version = "latest.release")
 	implementation(group = "ch.qos.logback", name = "logback-classic", version = "latest.release")
 	implementation(group = "io.github.cdimascio", name = "dotenv-kotlin", version = "latest.release")

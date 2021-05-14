@@ -5,10 +5,11 @@ import net.dv8tion.jda.api.JDABuilder
 import net.dv8tion.jda.api.OnlineStatus
 import net.dv8tion.jda.api.entities.Activity
 import net.dv8tion.jda.api.interactions.commands.OptionType.STRING
-import java.util.logging.Logger
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
 const val prefix = "/"
-val logger: Logger = Logger.getLogger("LaTeXBot")
+val logger: Logger = LoggerFactory.getLogger("LaTeXBot")
 
 val jda = JDABuilder
 	.createDefault(dotenv()["TOKEN"] ?: throw IllegalArgumentException("token not found"))
@@ -19,7 +20,6 @@ val botAvatar = jda.getUserById(745331926100869161L)?.effectiveAvatarUrl
 	?: throw NullPointerException("The avatar for TheOnlyTails couldn't be found.")
 
 fun main() {
-
 	jda.presence.setPresence(
 		OnlineStatus.DO_NOT_DISTURB,
 		Activity.listening("testing-channel")

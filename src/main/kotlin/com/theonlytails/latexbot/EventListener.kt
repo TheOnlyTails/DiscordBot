@@ -1,6 +1,6 @@
 package com.theonlytails.latexbot
 
-import com.nfbsoftware.latex.LaTeXConverter
+import dev.minn.jda.ktx.Embed
 import io.github.cdimascio.dotenv.dotenv
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
@@ -9,7 +9,7 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MultipartBody.Companion.FORM
 import okhttp3.RequestBody.Companion.asRequestBody
-import org.scilab.forge.jlatexmath.ParseException
+import org.scilab.forge.jlatexmath.JMathTeXException
 import java.awt.Color
 
 class EventListener : ListenerAdapter() {
@@ -25,67 +25,96 @@ class EventListener : ListenerAdapter() {
 
 fun onHelp(event: SlashCommandEvent) {
 	event.reply {
-		embed {
-			author(
-				"Made by TheOnlyTails",
-				"https://theonlytails.com/",
-				jda.getUserById(645291351562518542L)?.avatarUrl
+		Embed {
+			author {
+				name = "LaTeXBot"
+				url = "https://github.com/theonlytails/latexbot/"
+				iconUrl = botAvatar
+			}
+			title = "LaTeXBot"
+			field {
+				name = "About"
+				value =
+					"This bot is used to parse [LaTeX](https://www.latex-project.org/) expressions. Just type `${prefix}latex <expression>`"
+			}
+			footer {
+				name = "Made by TheOnlyTails"
+				iconUrl = jda.getUserById(645291351562518542L)?.avatarUrl
 					?: throw NullPointerException("The avatar for TheOnlyTails couldn't be found.")
-			)
-			title("LaTeXBot")
-			field("About", "This bot is used to parse LaTeX expressions. Just type `${prefix}latex <expression>`")
-			color(Color.green)
+			}
+			color = Color.green.rgb
 		}
 	}
 }
 
 fun onLatex(event: SlashCommandEvent) {
+	// sets up a deferred reply
 	event.acknowledge().queue()
 
+	// gets the expression
 	val latexExpression = event["expression"].asString
 
-	try {
-		val latexImage = LaTeXConverter.convertToImage(latexExpression)
-
-		val body = multipartBody(FORM) {
-			addFormDataPart("image", latexImage.name, latexImage.asRequestBody("text/plain".toMediaType()))
+	fun error() = event.hook.editOriginal(
+		Embed {
+			field {
+				name = "Something Went wrong! Please try again!"
+				value = "The expression `$latexExpression` is invalid."
+			}
+			color = Color.red.rgb
 		}
+	).queue()
 
+	try {
+		// parses it into a rendered image
+		val latexImage = latexExpression.parseLatex()
+
+		// prepares the request to the imgur API
 		val request = request {
 			url("https://api.imgur.com/3/image")
-			method("POST", body)
+			method("POST", multipartBody(FORM) {
+				addFormDataPart("image", latexImage.name, latexImage.asRequestBody("text/plain".toMediaType()))
+			})
 			addHeader("Authorization", "Client-ID ${dotenv()["IMGUR_CLIENT"]}")
 		}
 
+		// executes the request and gets the response JSON
 		val response = okHttpClient().newCall(request).execute().body?.string()
-			?: throw NoSuchElementException("Couldn't fetch the Imgur response.")
+			?: throw NoSuchElementException("Couldn't fetch the Imgur response.").also { error() }
 
+		// destructures the response
 		val (data, success, status) = Json.decodeFromString<ImgurImage>(response)
 
-		if (!success) logger.severe("Failed getting image from Imgur, status code = $status")
+		// gets the link from the image's data
+		val link = data["link"].toString().trim('"')
 
-		logger.info(data["link"].toString())
+		if (!success) {
+			logger.error("Failed getting image from Imgur, status code = $status")
+			error()
+		}
+
+		logger.debug(link)
 
 		event.hook.editOriginal(
-			embed {
-				author(event.user.name, iconUrl = event.user.effectiveAvatarUrl)
-				title("LaTeX Rendering Result")
-				field("Processed expression:", "`$latexExpression`")
-				image(data["link"].toString().trim('"'))
-				footer("LaTeXBot by TheOnlyTails", botAvatar)
-				color(Color.green)
-			}
-		).queue()
-	} catch (e: ParseException) {
-		e.printStackTrace()
-		event.hook.editOriginal(
-			embed {
-				field(
-					"Something Went wrong! Please try again!",
-					"The expression `$latexExpression` is invalid."
-				)
-				color(Color.red)
-			}
-		).queue()
+			Embed {
+				author {
+					name = event.user.name
+					iconUrl = event.user.effectiveAvatarUrl
+				}
+				title = "LaTeX Rendering Result"
+				field {
+					name = "Processed expression:"
+					value = "`$latexExpression`"
+				}
+				image = link
+				footer {
+					name = "LaTeXBot by TheOnlyTails"
+					iconUrl = botAvatar
+				}
+
+				color = Color.green.rgb
+			}).queue()
+	} catch (e: JMathTeXException) {
+		logger.error(e.localizedMessage)
+		error()
 	}
 }
