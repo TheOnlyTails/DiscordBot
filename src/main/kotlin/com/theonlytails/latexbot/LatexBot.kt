@@ -14,17 +14,14 @@ val logger: Logger = LoggerFactory.getLogger("LaTeXBot")
 val jda = JDABuilder
 	.createDefault(dotenv()["TOKEN"] ?: throw IllegalArgumentException("token not found"))
 	.addEventListeners(EventListener())
+	.setActivity(Activity.listening("testing"))
+	.setStatus(OnlineStatus.DO_NOT_DISTURB)
 	.build()
 
 val botAvatar = jda.getUserById(745331926100869161L)?.effectiveAvatarUrl
 	?: throw NullPointerException("The avatar for TheOnlyTails couldn't be found.")
 
 fun main() {
-	jda.presence.setPresence(
-		OnlineStatus.DO_NOT_DISTURB,
-		Activity.listening("testing-channel")
-	)
-
 	jda.getGuildById(758284094827266048L)?.updateCommands()?.addCommands(
 		command("help", "How to use the bot."),
 		command("latex", "Parses a LaTeX expression and replies with a rendered version.") {
